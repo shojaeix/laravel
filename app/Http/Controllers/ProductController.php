@@ -12,11 +12,18 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return array
+     * @return array|\Illuminate\Http\Response
      */
     public function index()
     {
-        return Product::query()->paginate()->items();
+        $paginatedResult = Product::query()->paginate();
+        $headers = [
+            'result_page' => $paginatedResult->currentPage(),
+            'result_total' => $paginatedResult->total(),
+            'result_last_page' => $paginatedResult->lastPage()
+        ];
+
+        return response($paginatedResult->items(), 200, $headers);
     }
 
     /**
@@ -34,25 +41,14 @@ class ProductController extends Controller
                 "price" => "required|int",
                 "photo" => "string",
                 "barcode_number" => "string",
-                "produced_at" => "int",
-                "expire_date" => "int"
+                "produced_at" => "date",
+                "expire_date" => "date"
             ]);
         } catch (\Illuminate\Validation\ValidationException $exception){
-            return response($exception->getMessage(), 400);
+            return response($exception->errorBag, 400);
         }
 
         $product = new Product($inputs);
-
-        // set dates
-        if(isset($inputs['produced_at'])) {
-            $product->produced_at = Carbon::createFromTimestamp($inputs['produced_at'], new \DateTimeZone("UTC"));
-            unset($inputs['produced_at']);
-        }
-
-        if(isset($inputs['expire_date'])) {
-            $product->expire_date = Carbon::createFromTimestamp($inputs['expire_date'], new \DateTimeZone("UTC"));
-            unset($inputs['expire_date']);
-        }
 
         //
         $product->save();
@@ -85,22 +81,11 @@ class ProductController extends Controller
                 "price" => "required|int",
                 "photo" => "string",
                 "barcode_number" => "string",
-                "produced_at" => "int",
-                "expire_date" => "int"
+                "produced_at" => "date",
+                "expire_date" => "date"
             ]);
         } catch (\Illuminate\Validation\ValidationException $exception){
-            return response($exception->getMessage(), 400);
-        }
-
-        // set dates
-        if(isset($inputs['produced_at'])) {
-            $product->produced_at = Carbon::createFromTimestamp($inputs['produced_at'], new \DateTimeZone("UTC"));
-            unset($inputs['produced_at']);
-        }
-
-        if(isset($inputs['expire_date'])) {
-            $product->expire_date = Carbon::createFromTimestamp($inputs['expire_date'], new \DateTimeZone("UTC"));
-            unset($inputs['expire_date']);
+            return response($exception->errorBag, 400);
         }
 
         foreach ($inputs as $key => $value) {

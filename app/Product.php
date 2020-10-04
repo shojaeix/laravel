@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    protected $fillable = ["name", "price", "expire_time"];
+    protected $fillable = ["name", "price", "expire_date"];
 
     protected $casts = [
-        'expire_time' => 'datetime',
+        'expire_date' => 'datetime',
         'produced_at' => 'datetime'
     ];
 
