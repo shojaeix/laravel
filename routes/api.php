@@ -26,3 +26,7 @@ Route::resource("product", "ProductController", [
 ]);
 
 Route::get('expiration/closest', 'ProductExpirationController@closest');
+
+Route::resource('category', 'CategoryController', [
+    'except' => ['create', 'edit']
+]);
